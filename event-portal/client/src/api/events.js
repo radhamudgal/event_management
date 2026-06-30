@@ -1,35 +1,23 @@
-// API calls for events — list, get, create, update, delete
-// Uses apiFetch from client.js which attaches the auth token automatically
+/**
+ * events.js — Event API calls
+ * listEvents  → GET /api/events (with optional ?q and ?status)
+ * getEvent    → GET /api/events/:id
+ * createEvent → POST /api/events
+ * updateEvent → PUT /api/events/:id
+ * deleteEvent → DELETE /api/events/:id
+ */
 
 import { apiFetch } from './client.js';
 
-// GET /api/events — public
-// params: { q, status } — optional search and filter
-export async function listEvents(params = {}) {
-  // Remove empty/undefined values so we don't send ?status=undefined
-  const clean = Object.fromEntries(
-    Object.entries(params).filter(([, v]) => v !== undefined && v !== '' && v !== null)
-  );
-  const query = new URLSearchParams(clean).toString();
-  return apiFetch(`/api/events${query ? `?${query}` : ''}`);
+// Strip empty/undefined params before building query string
+export function listEvents(params = {}) {
+  const q = new URLSearchParams(
+    Object.fromEntries(Object.entries(params).filter(([, v]) => v != null && v !== ''))
+  ).toString();
+  return apiFetch(`/api/events${q ? `?${q}` : ''}`);
 }
 
-// GET /api/events/:id — public
-export async function getEvent(id) {
-  return apiFetch(`/api/events/${id}`);
-}
-
-// POST /api/events — requires organizer or admin
-export async function createEvent(payload) {
-  return apiFetch('/api/events', { method: 'POST', body: payload });
-}
-
-// PUT /api/events/:id — requires auth (ownership checked on server)
-export async function updateEvent(id, payload) {
-  return apiFetch(`/api/events/${id}`, { method: 'PUT', body: payload });
-}
-
-// DELETE /api/events/:id — requires auth (ownership checked on server)
-export async function deleteEvent(id) {
-  return apiFetch(`/api/events/${id}`, { method: 'DELETE' });
-}
+export const getEvent    = (id)           => apiFetch(`/api/events/${id}`);
+export const createEvent = (payload)      => apiFetch('/api/events',      { method: 'POST',   body: payload });
+export const updateEvent = (id, payload)  => apiFetch(`/api/events/${id}`, { method: 'PUT',    body: payload });
+export const deleteEvent = (id)           => apiFetch(`/api/events/${id}`, { method: 'DELETE' });

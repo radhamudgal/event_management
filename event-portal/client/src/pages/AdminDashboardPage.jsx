@@ -1,9 +1,9 @@
-// AdminDashboardPage — full control panel for admins
-// Tabs: "Overview" | "All Events" | "All Registrations"
-//
-// Overview: stats cards (users, events, registrations, confirmed) + recent registrations table
-// All Events: table of ALL events with organizer info, Edit/Delete buttons
-// All Registrations: filter by event, search, full table, Export CSV
+/**
+ * AdminDashboardPage.jsx — Full control panel for admin users
+ * Tab 1 "Overview":          stats cards + recent registrations preview table.
+ * Tab 2 "All Events":        every event with organizer info, Edit/Delete buttons.
+ * Tab 3 "All Registrations": filter by event, search by name/email/event, Export CSV.
+ */
 
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Download, Calendar, Users, FileSpreadsheet, Search, X, LayoutDashboard, CheckCircle, XCircle, TrendingUp } from 'lucide-react';

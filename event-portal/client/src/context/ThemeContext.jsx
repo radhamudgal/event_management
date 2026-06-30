@@ -1,45 +1,33 @@
+/**
+ * ThemeContext.jsx — Dark/Light mode
+ * Reads preference from localStorage, falls back to system preference.
+ * Provides: theme ('light' | 'dark'), toggleTheme()
+ */
+
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved;
-    // Check system preference
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
-  });
+  const [theme, setTheme] = useState(() =>
+    localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  );
 
+  // Apply dark class to <html> whenever theme changes
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.style.colorScheme = 'dark';
-    } else {
-      root.classList.remove('dark');
-      root.style.colorScheme = 'light';
-    }
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.style.colorScheme = theme;
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  function toggleTheme() {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  }
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useTheme must be inside ThemeProvider');
+  return ctx;
 }

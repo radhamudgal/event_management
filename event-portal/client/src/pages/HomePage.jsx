@@ -1,6 +1,9 @@
-// HomePage — public landing page
-// Shows a hero section, search/filter bar, and a grid of event cards
-// Each card shows: title, date, location, organizer, spots left, status badge
+/**
+ * HomePage.jsx — Public landing page
+ * Shows a hero banner, a search/filter bar, and a responsive grid of event cards.
+ * Each card displays: title, date, location, organizer, spots left, and status.
+ * Events are fetched from the API and re-fetched when the search or filter changes.
+ */
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -19,6 +22,7 @@ const GRADIENTS = [
   'from-blue-500 to-cyan-500'
 ];
 
+// Renders the full home page: hero, search bar, and event grid
 export default function HomePage() {
   const { user } = useAuth();
 
@@ -30,7 +34,7 @@ export default function HomePage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('active');
 
-  // Load events whenever search or status changes
+  // Fetches events from the API whenever search or status filter changes
   useEffect(() => {
     let active = true;
     (async () => {

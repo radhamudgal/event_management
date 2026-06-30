@@ -1,8 +1,9 @@
-// EventDetailsPage — shows full details of a single event
-// Includes: banner, date/location/capacity info, description
-// Registration form: ticket type (standard/vip) + notes
-// If not logged in: shows "Login to Register" button
-// If already registered or event full: disables form
+/**
+ * EventDetailsPage.jsx — Full details view for a single event
+ * Shows: banner, date/location/capacity info, description, and a registration form.
+ * Registration form handles: ticket type (standard/vip) + optional notes.
+ * States handled: loading, error, already registered, event full, not logged in.
+ */
 
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ import { getEvent } from '../api/events.js';
 import { registerForEvent } from '../api/registrations.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Renders the event detail view with registration form
 export default function EventDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function EventDetailsPage() {
   const [regLoading, setRegLoading] = useState(false);
   const [regSuccess, setRegSuccess] = useState(false);
 
-  // Load event details on mount
+  // Fetches event details from the API when the page loads
   useEffect(() => {
     let active = true;
     (async () => {
@@ -46,7 +48,7 @@ export default function EventDetailsPage() {
     return () => { active = false; };
   }, [id]);
 
-  // Handle registration form submit
+  // Submits the registration form; redirects to login if the user isn't authenticated
   async function onRegister(e) {
     e.preventDefault();
     if (!user) {

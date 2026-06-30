@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "seed": "node src/seed.js",
     "lint": "eslint .",
     "test": "echo \"No tests yet\""
   },
@@ -19,10 +18,12 @@
     "express-async-errors": "^3.1.1",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb-memory-server": "^11.2.0",
     "mongoose": "^8.6.0",
     "morgan": "^1.10.0",
     "validator": "^13.12.0"
+  },
+  "optionalDependencies": {
+    "mongodb-memory-server": "^11.2.0"
   },
   "devDependencies": {
     "eslint": "^9.8.0",
@@ -33,5 +34,8 @@
   "description": "",
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

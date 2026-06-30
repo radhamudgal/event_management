@@ -1,44 +1,33 @@
-// Auth middleware — protects routes by verifying JWT tokens
-// requireAuth: any logged-in user
-// requireAdmin: only admin role
-// requireOrganizer: organizer OR admin role
+/**
+ * authMiddleware.js — JWT route protection
+ * requireAuth      → any logged-in user (attaches req.user)
+ * requireAdmin     → admin role only
+ * requireOrganizer → organizer OR admin
+ */
 
 import jwt from 'jsonwebtoken';
 
-// Verify the Bearer token and attach user payload to req.user
+// Verify Bearer token and attach decoded user to req.user
 export function requireAuth(req, res, next) {
-  const header = req.headers.authorization;
-
-  // Check that Authorization header exists and starts with "Bearer "
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Missing or invalid Authorization header' });
-  }
-
-  const token = header.slice('Bearer '.length);
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ message: 'No token provided' });
 
   try {
-    // Verify and decode the token
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload; // { id, email, name, role }
+    req.user = jwt.verify(auth.slice(7), process.env.JWT_SECRET); // { id, email, name, role }
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid or expired token' });
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 }
 
-// Only allow admin role
+// Only admin role
 export function requireAdmin(req, res, next) {
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({ message: 'Admin access required' });
-  }
-  next();
+  req.user?.role === 'admin' ? next() : res.status(403).json({ message: 'Admin access required' });
 }
 
-// Allow organizer OR admin role (organizers manage their own events)
+// Organizer or admin
 export function requireOrganizer(req, res, next) {
-  const role = req.user?.role;
-  if (role !== 'organizer' && role !== 'admin') {
-    return res.status(403).json({ message: 'Organizer or admin access required' });
-  }
-  next();
+  ['organizer', 'admin'].includes(req.user?.role)
+    ? next()
+    : res.status(403).json({ message: 'Organizer access required' });
 }

@@ -1,39 +1,29 @@
-// AuthContext — provides user authentication state to the whole app
-// Reads token from localStorage on mount, decodes it with jwt-decode
-// Provides: user, token, login(token), logout()
-// user shape: { id, email, name, role }
+/**
+ * AuthContext.jsx — Global authentication state
+ * Reads JWT from localStorage on load and decodes user info.
+ * Provides: user { id, email, name, role }, token, login(token), logout()
+ */
 
 import { createContext, useContext, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  // Initialize state from localStorage on first render
-  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('token');
-    if (!stored) return null;
-    try {
-      return jwtDecode(stored); // { id, email, name, role, iat, exp }
-    } catch {
-      return null;
-    }
-  });
+// Decode token safely — returns null on failure
+const decode = (token) => { try { return jwtDecode(token); } catch { return null; } };
 
-  // Call this after a successful login or register
-  // Saves token to localStorage and decodes user info
+export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [user,  setUser]  = useState(() => decode(localStorage.getItem('token')));
+
+  // Save token after login/register
   function login(newToken) {
     localStorage.setItem('token', newToken);
     setToken(newToken);
-    try {
-      setUser(jwtDecode(newToken));
-    } catch {
-      setUser(null);
-    }
+    setUser(decode(newToken));
   }
 
-  // Call this to log out — clears token and user from state and storage
+  // Clear everything on logout
   function logout() {
     localStorage.removeItem('token');
     setToken(null);
@@ -47,9 +37,9 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Custom hook — use this in any component to access auth state
+// Hook to use auth state in any component
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
+  if (!ctx) throw new Error('useAuth must be inside AuthProvider');
   return ctx;
 }

@@ -1,6 +1,9 @@
-// RegisterPage — sign up form with role selection
-// Role options: "I want to attend events" (participant) or "I want to host events" (organizer)
-// On success: saves token, redirects based on role
+/**
+ * RegisterPage.jsx — New account sign-up form with role selection
+ * Two role options: "Attend Events" (participant) or "Host Events" (organizer).
+ * On success: saves the JWT and redirects by role:
+ *   organizer → /organizer | participant → /
+ */
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,6 +12,7 @@ import { User, Mail, Lock, UserPlus, Calendar, Users, Briefcase } from 'lucide-r
 import { registerUser } from '../api/auth.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Renders the registration form page
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -22,7 +26,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Handle form submission
+  // Submits the new account to the API, saves the token, and redirects based on role
   async function onSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -76,7 +80,7 @@ export default function RegisterPage() {
                 type="text"
                 required
                 className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                placeholder="John Doe"
+                placeholder="Your full name"
                 value={form.name}
                 onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
               />

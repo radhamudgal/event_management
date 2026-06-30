@@ -1,18 +1,17 @@
-export function notFound(req, res, next) {
+/**
+ * errorMiddleware.js — Global error handling
+ * notFound     → 404 for unmatched routes
+ * errorHandler → catches all errors thrown in controllers
+ */
+
+// 404 — no route matched
+export function notFound(req, res) {
   res.status(404).json({ message: `Not found: ${req.originalUrl}` });
 }
 
-export function errorHandler(err, req, res, next) {
-  console.error(err);
-
-  const status = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
-
-  // Mongoose validation errors
-  if (err.name === 'ValidationError') {
-    return res.status(400).json({ message: err.message });
-  }
-
-  return res.status(status).json({ message });
+// Global error handler (4 params required by Express)
+export function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
+  console.error(err.message);
+  const status = err.name === 'ValidationError' ? 400 : (err.statusCode || 500);
+  res.status(status).json({ message: err.message || 'Server error' });
 }
-

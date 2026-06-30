@@ -1,12 +1,18 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+/**
+ * client.js — Central API fetch utility
+ * All API calls use apiFetch() which auto-attaches the JWT token.
+ * Dev:  VITE_API_BASE_URL is empty → Vite proxy handles /api/* → localhost:5000
+ * Prod: set VITE_API_BASE_URL to your deployed backend URL
+ */
 
-function getToken() {
-  return localStorage.getItem('token');
-}
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
+// Get stored token from localStorage
+const getToken = () => localStorage.getItem('token');
+
+// Central fetch — adds auth header and parses JSON response
 export async function apiFetch(path, { method = 'GET', body, headers = {} } = {}) {
   const token = getToken();
-
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method,
     headers: {
@@ -17,17 +23,11 @@ export async function apiFetch(path, { method = 'GET', body, headers = {} } = {}
     body: body ? JSON.stringify(body) : undefined
   });
 
-  const text = await res.text();
-  const data = text ? (() => { try { return JSON.parse(text); } catch { return text; } })() : null;
-
+  const data = await res.text().then(t => { try { return JSON.parse(t); } catch { return t; } });
   if (!res.ok) {
-    const message = data?.message || `Request failed with ${res.status}`;
-    const err = new Error(message);
+    const err = new Error(data?.message || `Error ${res.status}`);
     err.status = res.status;
-    err.data = data;
     throw err;
   }
-
   return data;
 }
-

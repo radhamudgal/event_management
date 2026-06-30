@@ -1,9 +1,11 @@
-// Layout — wraps every page with a navbar, main content area, and footer
-// Navbar shows different links based on the user's role:
-//   - participant: "My Tickets"
-//   - organizer: "My Events"
-//   - admin: "Admin Panel"
-// Also includes dark mode toggle and mobile hamburger menu
+/**
+ * Layout.jsx — Main app shell: navbar, content area, and footer
+ * Wraps every page. The navbar adapts based on the user's role:
+ *   - participant → "My Tickets"
+ *   - organizer   → "My Events"
+ *   - admin       → "Admin Panel"
+ * Also includes a dark/light mode toggle and a mobile hamburger menu.
+ */
 
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -75,18 +77,28 @@ export default function Layout({ children }) {
                 </Link>
               )}
 
-              {/* Organizer: My Events dashboard */}
-              {(user?.role === 'organizer') && (
-                <Link to="/organizer" className={`${navClass('/organizer')} flex items-center gap-1.5`}>
-                  <Briefcase className="w-4 h-4" /> My Events
-                </Link>
+              {/* Organizer: My Events dashboard + My Tickets */}
+              {user?.role === 'organizer' && (
+                <>
+                  <Link to="/my-tickets" className={`${navClass('/my-tickets')} flex items-center gap-1.5`}>
+                    <Ticket className="w-4 h-4" /> My Tickets
+                  </Link>
+                  <Link to="/organizer" className={`${navClass('/organizer')} flex items-center gap-1.5`}>
+                    <Briefcase className="w-4 h-4" /> My Events
+                  </Link>
+                </>
               )}
 
-              {/* Admin: Admin Panel */}
+              {/* Admin: Admin Panel + My Tickets */}
               {user?.role === 'admin' && (
-                <Link to="/admin" className={`${navClass('/admin')} flex items-center gap-1.5`}>
-                  <LayoutDashboard className="w-4 h-4" /> Admin Panel
-                </Link>
+                <>
+                  <Link to="/my-tickets" className={`${navClass('/my-tickets')} flex items-center gap-1.5`}>
+                    <Ticket className="w-4 h-4" /> My Tickets
+                  </Link>
+                  <Link to="/admin" className={`${navClass('/admin')} flex items-center gap-1.5`}>
+                    <LayoutDashboard className="w-4 h-4" /> Admin Panel
+                  </Link>
+                </>
               )}
             </nav>
 
@@ -160,15 +172,25 @@ export default function Layout({ children }) {
               )}
 
               {user?.role === 'organizer' && (
-                <Link to="/organizer" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
-                  My Events
-                </Link>
+                <>
+                  <Link to="/my-tickets" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    My Tickets
+                  </Link>
+                  <Link to="/organizer" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    My Events
+                  </Link>
+                </>
               )}
 
               {user?.role === 'admin' && (
-                <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
-                  Admin Panel
-                </Link>
+                <>
+                  <Link to="/my-tickets" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    My Tickets
+                  </Link>
+                  <Link to="/admin" onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+                    Admin Panel
+                  </Link>
+                </>
               )}
 
               {/* Mobile user section */}

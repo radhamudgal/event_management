@@ -1,16 +1,9 @@
-// OrganizerDashboardPage — for organizers to manage their events and view registrations
-// Tabs: "My Events" | "Registrations"
-//
-// My Events tab:
-//   - Stats: total events, total registrations
-//   - Table of their events with Edit/Delete buttons
-//   - "Create Event" button opens a modal form
-//
-// Registrations tab:
-//   - Filter by event (their events only)
-//   - Search by name/email
-//   - Table of attendees
-//   - Export CSV button
+/**
+ * OrganizerDashboardPage.jsx — Dashboard for organizers to manage their events
+ * Tab 1 "My Events":  stats cards, event table with Edit/Delete, "Create Event" modal.
+ * Tab 2 "Registrations": filter by event, search by name/email, attendee table, Export CSV.
+ * Only shows events created by the currently logged-in organizer (filtered by createdBy._id).
+ */
 
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Download, Calendar, Users, FileSpreadsheet, Search, X, Briefcase, CheckCircle, XCircle } from 'lucide-react';
@@ -19,6 +12,7 @@ import { listEvents, createEvent, updateEvent, deleteEvent } from '../api/events
 import { organizerRegistrations } from '../api/registrations.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Renders the organizer dashboard with events and registrations tabs
 export default function OrganizerDashboardPage() {
   const { user } = useAuth();
 
@@ -42,15 +36,13 @@ export default function OrganizerDashboardPage() {
     startDate: '', endDate: '', capacity: 100, status: 'active'
   });
 
-  // Load organizer's events on mount
+  // Fetches all events and filters to only those created by the logged-in organizer
   async function reloadEvents() {
     const data = await listEvents({});
-    // Filter to only show events created by this organizer
-    // (server also enforces this, but we filter client-side for display)
-    setEvents(data);
+    setEvents(data.filter((ev) => ev.createdBy?._id?.toString() === user?.id));
   }
 
-  // Load registrations for organizer's events
+  // Fetches registrations for this organizer's events, optionally filtered by eventId
   async function reloadRegs(eventId = '') {
     const data = await organizerRegistrations(eventId || undefined);
     setRegs(data);
@@ -73,7 +65,7 @@ export default function OrganizerDashboardPage() {
     return () => { active = false; };
   }, []);
 
-  // Reset and open the create modal
+  // Clears the form and opens the create-event modal
   function openCreate() {
     setEditId('');
     setForm({ title: '', description: '', location: '', organizer: '', startDate: '', endDate: '', capacity: 100, status: 'active' });
@@ -81,7 +73,7 @@ export default function OrganizerDashboardPage() {
     setShowModal(true);
   }
 
-  // Populate form with event data and open edit modal
+  // Populates the form with existing event data and opens the edit modal
   function openEdit(ev) {
     setEditId(ev._id);
     setForm({
@@ -98,7 +90,7 @@ export default function OrganizerDashboardPage() {
     setShowModal(true);
   }
 
-  // Submit create or update
+  // Handles both create and update: submits the form, reloads events, closes modal
   async function onSubmit(e) {
     e.preventDefault();
     setFormError('');
@@ -116,7 +108,7 @@ export default function OrganizerDashboardPage() {
     }
   }
 
-  // Delete an event
+  // Asks for confirmation, then deletes the event and refreshes the data
   async function onDelete(id) {
     if (!confirm('Delete this event? This cannot be undone.')) return;
     try {

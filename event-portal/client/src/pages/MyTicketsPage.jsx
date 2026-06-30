@@ -1,9 +1,9 @@
-// MyTicketsPage — participant's ticket dashboard
-// Shows all registrations as ticket cards
-// Each card has: event info, status badge, ticket type
-// "View QR Ticket" button opens a modal with QRCodeSVG
-// QR modal has: event info, QR code, Download QR button, Print button
-// "Cancel" button for confirmed tickets
+/**
+ * MyTicketsPage.jsx — The attendee's personal ticket dashboard
+ * Displays all of the logged-in user's event registrations as ticket cards.
+ * Features: status badge, ticket type, "View QR Ticket" modal with scannable QR code,
+ * Download QR as SVG, Print ticket, and Cancel registration.
+ */
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { Ticket, Calendar, MapPin, X, Printer, AlertCircle, RefreshCw, Download,
 import { cancelRegistration, myRegistrations } from '../api/registrations.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Renders the My Tickets dashboard for the logged-in user
 export default function MyTicketsPage() {
   const { user } = useAuth();
 
@@ -24,7 +25,7 @@ export default function MyTicketsPage() {
   // Which ticket is open in the QR modal
   const [activeTicket, setActiveTicket] = useState(null);
 
-  // Load registrations on mount
+  // Fetches the user's registrations from the API
   async function reload() {
     setLoading(true);
     setError('');
@@ -40,7 +41,7 @@ export default function MyTicketsPage() {
 
   useEffect(() => { reload(); }, []);
 
-  // Cancel a registration
+  // Asks for confirmation, then cancels the given registration and reloads
   async function onCancel(regId) {
     if (!confirm('Cancel this registration?')) return;
     setCancellingId(regId);
@@ -54,7 +55,7 @@ export default function MyTicketsPage() {
     }
   }
 
-  // Download the QR code as an SVG file
+  // Serializes the QR code SVG element and triggers a browser download
   function handleDownloadQR(ticketId) {
     const svgEl = document.getElementById(`qr-${ticketId}`);
     if (!svgEl) return;

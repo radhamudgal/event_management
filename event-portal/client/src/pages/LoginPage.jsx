@@ -1,6 +1,9 @@
-// LoginPage — email + password login form
-// On success: saves token via AuthContext.login(), redirects based on role:
-//   admin → /admin, organizer → /organizer, participant → /
+/**
+ * LoginPage.jsx — Email and password login form
+ * On success: saves the JWT via AuthContext.login(), then redirects by role:
+ *   admin → /admin | organizer → /organizer | participant → /
+ * Includes clickable demo account buttons that auto-fill the form.
+ */
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,6 +12,7 @@ import { Mail, Lock, LogIn, Calendar } from 'lucide-react';
 import { loginUser } from '../api/auth.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+// Renders the login form page
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -17,7 +21,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Handle form submission
+  // Submits credentials to the API, saves the token, and redirects based on role
   async function onSubmit(e) {
     e.preventDefault();
     setLoading(true);
@@ -115,14 +119,6 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-
-        {/* Demo credentials hint */}
-        <div className="mt-5 p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-500 dark:text-slate-400">
-          <p className="font-bold text-slate-700 dark:text-slate-300 mb-1">Demo accounts:</p>
-          <p>Admin: admin@evently.com / admin123</p>
-          <p>Organizer: organizer@evently.com / org1234</p>
-          <p>User: user@evently.com / user1234</p>
-        </div>
 
         {/* Register link */}
         <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
