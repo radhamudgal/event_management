@@ -17,8 +17,11 @@ import { registerRoutes }              from './routes/index.js';
 dotenv.config();
 
 const app = express();
+// Strip trailing slash from CLIENT_ORIGIN to prevent CORS mismatch
+const clientOrigin = (process.env.CLIENT_ORIGIN || '*').replace(/\/$/, '');
+
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*', credentials: true }));
+app.use(cors({ origin: clientOrigin, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(morgan('dev'));
 
